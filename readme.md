@@ -27,6 +27,7 @@ Your old policies:
 ![lowcode-datapower](https://i.ibb.co/34dJC0H/datapower.png)
 
 After this Tutorial:
+
 ![code-apiconnect](https://i.ibb.co/34nYnhP/apiconnect-gatewayscript.png)
 
 
