@@ -22,11 +22,13 @@ This repository provides examples and explanations on how to use Gateway Script 
 In Gateway Script, many examples use callbacks. While this approach can be suitable for small scripts, it often leads to callback hell in more complex scenarios, making the code hard to understand and maintain. This repository demonstrates how to use the `util` module to avoid callback hell and create more readable, maintainable code.  
 
 Your old policies:
+
 ![lowcode-apiconnect](https://i.ibb.co/sRp7VxM/apiconnect.png)
 
 ![lowcode-datapower](https://i.ibb.co/34dJC0H/datapower.png)
 
 After this Tutorial:
+
 ![code-apiconnect](https://i.ibb.co/34nYnhP/apiconnect-gatewayscript.png)
 
 
