@@ -25,11 +25,13 @@ Your old policies:
 
 ![lowcode-apiconnect](https://i.ibb.co/sRp7VxM/apiconnect.png)
 
-![lowcode-datapower](https://i.ibb.co/34dJC0H/datapower.png)
+![lowcode-datapower](https://i.ibb.co/mGQDcLG/datapower.png)
 
 After this Tutorial:
 
 ![code-apiconnect](https://i.ibb.co/34nYnhP/apiconnect-gatewayscript.png)
+
+![code-datapower](https://i.ibb.co/8cggXkd/datapower-gatewayscript.png)
 
 
 ## Util Module
