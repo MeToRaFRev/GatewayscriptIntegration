@@ -125,6 +125,65 @@ const json2xmlBody = converter.toXML("badgerfish", JSON.parse(rawBody)); // Conv
 session.output.write({ json2xmlBody, xml2jsonBody });
 ```
 
+### Mapper
+
+```javascript
+const urlopen = require('urlopen')
+const util = require('util')
+const sm = require('service-metadata')
+sm.setVar('var://service/mpgw/skip-backside', true)
+
+const main = async ()=>{
+    const rawBody = session.input
+    const body = await util.promisify((rawBody, callback) => rawBody.readAsJSON(callback))(rawBody)
+    const response = {}
+    response.PatientID = body.tehodatZehot
+    response.PatientName = body.shemPrati
+    response.PatientLastName = body.shemMishpacha
+    response.PatientBirthDate = body.yomHuledet
+    response.PatientGender = body.min
+    response.PatientPhone = body.telefon
+    response.PatientEmail = body.email
+    response.PatientAddress = body.ktovet
+    return session.output.write(response)
+}
+main().catch((err)=>{console.error(err)})
+```
+### Read Responses (All Types)
+
+```javascript
+const util = require('util')
+const main = async ()=>{
+    const rawBody = session.input
+    // const body = await util.promisify((rawBody, callback) => rawBody.readAsJSON(callback))(rawBody) // JSON
+    // const body = await util.promisify((rawBody, callback) => rawBody.readAsXML(callback))(rawBody) // XML
+    // const body = await util.promisify((rawBody, callback) => rawBody.readAsBuffer(callback))(rawBody) // Buffer
+}
+```
+
+
+### Read Responses (All Types)
+
+```javascript
+const util = require('util')
+const urlopen = require('urlopen')
+const main = async ()=>{
+    const requestData = {
+        method: 'GET',
+        target: 'http://example.com',
+        data: undefined,
+        timeout: 60,
+        headers: {'Content-Type': 'application/json'},
+        sslClientProfile: undefined,
+        agent: undefined
+    }
+    const rawResponse = await util.promisify(urlopen.open)(requestData)
+    // const response = await util.promisify((rawResponse, callback) => rawResponse.readAsBuffer(callback))(rawResponse) // Buffer
+    // const response = await util.promisify((rawResponse, callback) => rawResponse.readAsJSON(callback))(rawResponse) // JSON
+    // const response = await util.promisify((rawResponse, callback) => rawResponse.readAsXML(callback))(rawResponse) // XML
+}
+```
+
 ## Recommendations
 
 ### Custom Utils Library
