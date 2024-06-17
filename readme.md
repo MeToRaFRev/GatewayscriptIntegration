@@ -302,6 +302,10 @@ const getEnvVariable = (key) => {
 
 These global functions allow you to control your code using a config and keeping the same code between environments. Using the `getEnvVariable()` will pull the right environment and use the parameters from the mentioned environments.
 
+## WIP GatewayscriptGPT
+
+- [GatewayScript GPT](https://chatgpt.com/g/g-eR7uiqR61-gatewayscript-generator)
+
 ## References
 
 - [DataPower GatewayScript APIs](https://www.ibm.com/docs/en/datapower-gateway/10.5.0?topic=gatewayscript-apis)
