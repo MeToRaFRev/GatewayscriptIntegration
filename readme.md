@@ -152,6 +152,45 @@ const main = async ()=>{
 }
 main().catch((err)=>{console.error(err)})
 ```
+### Read Body (All Types)
+
+```javascript
+const util = require("util");
+const sm = require("service-metadata");
+sm.setVar("var://service/mpgw/skip-backside", true); // Set Datapower variable
+const main = async () => {
+  const rawBody = session.input; // Read body into a GatewayScript variable
+  let body;
+  // Try reading as JSON
+  try {
+    body = await util.promisify((rawBody, callback) => rawBody.readAsJSON(callback))(rawBody);
+    return session.output.write(body);
+  } catch (err) {
+    // If JSON reading fails, continue to try XML
+  }
+  // Try reading as XML
+  try {
+    body = await util.promisify((rawBody, callback) => rawBody.readAsXML(callback))(rawBody);
+    return session.output.write(body);
+  } catch (err) {
+    // If XML reading fails, continue to try as Buffer (string)
+  }
+  // Default to reading as Buffer (string)
+  try {
+    body = await util.promisify((rawBody, callback) => rawBody.readAsBuffer(callback))(rawBody);
+    return session.output.write(body.toString());
+  } catch (err) {
+    console.error("Failed to read the body:", err);
+    return session.output.write({ error: "Unable to read the body" });
+  }
+};
+
+main().catch((err) => {
+  console.error(err);
+});
+```
+
+
 ### Read Responses (All Types)
 
 ```javascript
