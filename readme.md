@@ -13,12 +13,14 @@ This repository provides examples and explanations on how to use Gateway Script 
     - [Basic Invoke](#basic-invoke)
     - [Converter](#converter)
     - [Mapper](#mapper)
+    - [Read Body (All Types)](#read-body-all-types)
     - [Read Responses (All Types)](#read-responses-all-types)
     - [Read Responses (All Types)](#read-responses-all-types)
 6.  [Recommendations](#recommendations)
     - [Custom Utils Library](#custom-utils-library)
     - [Environment Flexibility](#environment-flexibility)
-7.  [References](#references)
+7.  [WIP GatewayscriptGPT](#wip-gatewayscriptgpt)
+8.  [References](#references)
 
 ## Introduction
 
