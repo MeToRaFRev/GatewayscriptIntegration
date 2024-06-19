@@ -17,7 +17,7 @@ This repository provides examples and explanations on how to use Gateway Script 
     - [Read Responses (All Types)](#read-responses-all-types)
     - [Read Responses (All Types)](#read-responses-all-types)
 6.  [Recommendations](#recommendations)
-    - [Custom Utils Library](#custom-utils-library)
+    - [Custom Utility Library](#custom-utility-library)
     - [Environment Flexibility](#environment-flexibility)
 7.  [WIP GatewayscriptGPT](#wip-gatewayscriptgpt)
 8.  [References](#references)
@@ -230,7 +230,7 @@ const main = async ()=>{
 
 ## Recommendations
 
-### Custom Utils Library
+### Custom Utility Library
 
 It is preferred to create some kind of custom utils library to use in your own system. This allows both global policies and more readability based on the usage of the company.
 
