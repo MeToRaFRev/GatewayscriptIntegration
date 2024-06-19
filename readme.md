@@ -15,7 +15,6 @@ This repository provides examples and explanations on how to use Gateway Script 
     - [Mapper](#mapper)
     - [Read Body (All Types)](#read-body-all-types)
     - [Read Responses (All Types)](#read-responses-all-types)
-    - [Read Responses (All Types)](#read-responses-all-types)
 6.  [Recommendations](#recommendations)
     - [Custom Utility Library](#custom-utility-library)
     - [Environment Flexibility](#environment-flexibility)
@@ -191,20 +190,6 @@ main().catch((err) => {
   console.error(err);
 });
 ```
-
-
-### Read Responses (All Types)
-
-```javascript
-const util = require('util')
-const main = async ()=>{
-    const rawBody = session.input
-    // const body = await util.promisify((rawBody, callback) => rawBody.readAsJSON(callback))(rawBody) // JSON
-    // const body = await util.promisify((rawBody, callback) => rawBody.readAsXML(callback))(rawBody) // XML
-    // const body = await util.promisify((rawBody, callback) => rawBody.readAsBuffer(callback))(rawBody) // Buffer
-}
-```
-
 
 ### Read Responses (All Types)
 
