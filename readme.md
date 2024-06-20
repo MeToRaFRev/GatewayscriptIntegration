@@ -111,21 +111,47 @@ This script lets you configure the backend of the endpoint with all its paramete
 ### Converter
 
 ```javascript
+const util = require("util");
 const converter = require("json-xml-converter"); // Library
-const rawBody = session.input; // Read body into a GatewayScript variable
-const xml2jsonBody = converter.toJSON(
-  "badgerfish",
-  XML.parse(
-    XML.stringify(
-      await util.promisify((response, callback) =>
-        response.readAsXML(callback)
-      )(response)
-    )
-  )
-); // Convert XML to JSON
-const json2xmlBody = converter.toXML("badgerfish", JSON.parse(rawBody)); // Convert JSON to XML
 
-session.output.write({ json2xmlBody, xml2jsonBody });
+const readAsXML = util.promisify((input, callback) =>
+  input.readAsXML(callback)
+);
+const readAsJSON = util.promisify((input, callback) =>
+  input.readAsJSON(callback)
+);
+
+const main = async () => {
+  const rawBody = session.input; // Read body into a GatewayScript variable
+
+  // Convert XML to JSON
+  let xml2jsonBody;
+  try {
+    const xmlBody = await readAsXML(rawBody);
+    const xmlString = XML.stringify(xmlBody);
+    xml2jsonBody = converter.toJSON("badgerfish", XML.parse(xmlString));
+  } catch (err) {
+    console.error("Failed to convert XML to JSON:", err);
+    xml2jsonBody = { error: "Unable to convert XML to JSON" };
+  }
+
+  // Convert JSON to XML
+  let json2xmlBody;
+  try {
+    const jsonBody = await readAsJSON(rawBody);
+    json2xmlBody = converter.toXML("badgerfish", jsonBody);
+  } catch (err) {
+    console.error("Failed to convert JSON to XML:", err);
+    json2xmlBody = { error: "Unable to convert JSON to XML" };
+  }
+
+  // Write the output
+  session.output.write({ json2xmlBody, xml2jsonBody });
+};
+
+main().catch((err) => {
+  console.error(err);
+});
 ```
 
 This script demonstrates how to convert between JSON and XML using the `json-xml-converter` library. This can be useful for scenarios where data format conversion is required for integration purposes.
