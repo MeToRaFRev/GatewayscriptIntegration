@@ -1,6 +1,6 @@
 # Gatewayscript Integration
 
-This repository provides examples and explanations on how to use Gateway Script for integration in IBM DataPower and API Connect. It addresses the challenges of using callbacks in Gateway Script and demonstrates how to use the `util` module to improve code readability and maintainability.
+This repository showcases how to use Gateway Script to replace the low-code blocks/actions in IBM API Connect and DataPower with more customizable and integratable code. By leveraging the `util` module and other techniques, we aim to create more readable, maintainable, and flexible scripts that provide the full power of JavaScript for API and data integrations.
 
 ## Table of Contents
 
@@ -23,7 +23,7 @@ This repository provides examples and explanations on how to use Gateway Script 
 
 ## Introduction
 
-In Gateway Script, many examples use callbacks. While this approach can be suitable for small scripts, it often leads to callback hell in more complex scenarios, making the code hard to understand and maintain. This repository demonstrates how to use the `util` module to avoid callback hell and create more readable, maintainable code.  
+IBM API Connect and DataPower often use low-code blocks/actions for building integration logic. While these can be convenient for simple scenarios, they often fall short in flexibility and maintainability for more complex use cases. This repository demonstrates how to replace these low-code blocks with Gateway Script, providing more control and customizability.
 
 Your old policies:
 
@@ -36,7 +36,6 @@ After this Tutorial:
 ![code-apiconnect](https://i.ibb.co/34nYnhP/apiconnect-gatewayscript.png)
 
 ![code-datapower](https://i.ibb.co/8cggXkd/datapower-gatewayscript.png)
-
 
 ## Util Module
 
@@ -129,61 +128,80 @@ const json2xmlBody = converter.toXML("badgerfish", JSON.parse(rawBody)); // Conv
 session.output.write({ json2xmlBody, xml2jsonBody });
 ```
 
+This script demonstrates how to convert between JSON and XML using the `json-xml-converter` library. This can be useful for scenarios where data format conversion is required for integration purposes.
+
 ### Mapper
 
 ```javascript
-const urlopen = require('urlopen')
-const util = require('util')
-const sm = require('service-metadata')
-sm.setVar('var://service/mpgw/skip-backside', true)
+const urlopen = require("urlopen");
+const util = require("util");
+const sm = require("service-metadata");
+sm.setVar("var://service/mpgw/skip-backside", true);
 
-const main = async ()=>{
-    const rawBody = session.input
-    const body = await util.promisify((rawBody, callback) => rawBody.readAsJSON(callback))(rawBody)
-    const response = {}
-    response.PatientID = body.tehodatZehot
-    response.PatientName = body.shemPrati
-    response.PatientLastName = body.shemMishpacha
-    response.PatientBirthDate = body.yomHuledet
-    response.PatientGender = body.min
-    response.PatientPhone = body.telefon
-    response.PatientEmail = body.email
-    response.PatientAddress = body.ktovet
-    return session.output.write(response)
-}
-main().catch((err)=>{console.error(err)})
+const main = async () => {
+  const rawBody = session.input;
+  const body = await util.promisify((rawBody, callback) =>
+    rawBody.readAsJSON(callback)
+  )(rawBody);
+  const response = {};
+  response.PatientID = body.tehodatZehot;
+  response.PatientName = body.shemPrati;
+  response.PatientLastName = body.shemMishpacha;
+  response.PatientBirthDate = body.yomHuledet;
+  response.PatientGender = body.min;
+  response.PatientPhone = body.telefon;
+  response.PatientEmail = body.email;
+  response.PatientAddress = body.ktovet;
+  return session.output.write(response);
+};
+main().catch((err) => {
+  console.error(err);
+});
 ```
+
+This example shows how to map JSON request bodies to a different JSON structure. It reads a JSON input, maps its fields to a new structure, and returns the transformed JSON.
+
 ### Read Body (All Types)
 
 ```javascript
 const util = require("util");
 const sm = require("service-metadata");
 sm.setVar("var://service/mpgw/skip-backside", true); // Set Datapower variable
+
+const readAsJSON = util.promisify((input, callback) =>
+  input.readAsJSON(callback)
+);
+const readAsXML = util.promisify((input, callback) =>
+  input.readAsXML(callback)
+);
+const readAsBuffer = util.promisify((input, callback) =>
+  input.readAsBuffer(callback)
+);
+
 const main = async () => {
   const rawBody = session.input; // Read body into a GatewayScript variable
   let body;
+
   // Try reading as JSON
   try {
-    body = await util.promisify((rawBody, callback) => rawBody.readAsJSON(callback))(rawBody);
-    return session.output.write(body);
+    body = await readAsJSON(rawBody);
   } catch (err) {
     // If JSON reading fails, continue to try XML
+    try {
+      body = await readAsXML(rawBody);
+    } catch (err) {
+      // If XML reading fails, continue to try as Buffer (string)
+      try {
+        body = await readAsBuffer(rawBody);
+        body = body.toString(); // Convert Buffer to string
+      } catch (err) {
+        console.error("Failed to read the body:", err);
+        body = { error: "Unable to read the body" };
+      }
+    }
   }
-  // Try reading as XML
-  try {
-    body = await util.promisify((rawBody, callback) => rawBody.readAsXML(callback))(rawBody);
-    return session.output.write(body);
-  } catch (err) {
-    // If XML reading fails, continue to try as Buffer (string)
-  }
-  // Default to reading as Buffer (string)
-  try {
-    body = await util.promisify((rawBody, callback) => rawBody.readAsBuffer(callback))(rawBody);
-    return session.output.write(body.toString());
-  } catch (err) {
-    console.error("Failed to read the body:", err);
-    return session.output.write({ error: "Unable to read the body" });
-  }
+
+  session.output.write(body);
 };
 
 main().catch((err) => {
@@ -191,27 +209,31 @@ main().catch((err) => {
 });
 ```
 
+This script demonstrates how to read the request body in various formats (JSON, XML, or Buffer) and handle them appropriately. It shows the flexibility of Gateway Script in dealing with different types of payloads.
+
 ### Read Responses (All Types)
 
 ```javascript
-const util = require('util')
-const urlopen = require('urlopen')
-const main = async ()=>{
-    const requestData = {
-        method: 'GET',
-        target: 'http://example.com',
-        data: undefined,
-        timeout: 60,
-        headers: {'Content-Type': 'application/json'},
-        sslClientProfile: undefined,
-        agent: undefined
-    }
-    const rawResponse = await util.promisify(urlopen.open)(requestData)
-    // const response = await util.promisify((rawResponse, callback) => rawResponse.readAsBuffer(callback))(rawResponse) // Buffer
-    // const response = await util.promisify((rawResponse, callback) => rawResponse.readAsJSON(callback))(rawResponse) // JSON
-    // const response = await util.promisify((rawResponse, callback) => rawResponse.readAsXML(callback))(rawResponse) // XML
-}
+const util = require("util");
+const urlopen = require("urlopen");
+const main = async () => {
+  const requestData = {
+    method: "GET",
+    target: "http://example.com",
+    data: undefined,
+    timeout: 60,
+    headers: { "Content-Type": "application/json" },
+    sslClientProfile: undefined,
+    agent: undefined,
+  };
+  const rawResponse = await util.promisify(urlopen.open)(requestData);
+  // const response = await util.promisify((rawResponse, callback) => rawResponse.readAsBuffer(callback))(rawResponse) // Buffer
+  // const response = await util.promisify((rawResponse, callback) => rawResponse.readAsJSON(callback))(rawResponse) // JSON
+  // const response = await util.promisify((rawResponse, callback) => rawResponse.readAsXML(callback))(rawResponse) // XML
+};
 ```
+
+This script demonstrates how to make an HTTP GET request using the `urlopen` module and the `util.promisify` function. It includes placeholders for reading the response in different formats (Buffer, JSON, or XML), showcasing the versatility of Gateway Script in handling various response types.
 
 ## Recommendations
 
